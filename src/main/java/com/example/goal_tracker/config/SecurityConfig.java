@@ -1,6 +1,5 @@
 package com.example.goal_tracker.config;
 
-import com.example.goal_tracker.auth.model.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
