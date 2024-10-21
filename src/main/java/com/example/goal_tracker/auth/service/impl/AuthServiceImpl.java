@@ -5,7 +5,7 @@ import com.example.goal_tracker.auth.dto.LoginResponse;
 import com.example.goal_tracker.auth.dto.RegisterRequest;
 import com.example.goal_tracker.auth.exception.UserAlreadyExistsException;
 import com.example.goal_tracker.auth.exception.UserNotFoundException;
-import com.example.goal_tracker.auth.model.Role;
+import com.example.goal_tracker.auth.mapper.UserMapper;
 import com.example.goal_tracker.auth.model.User;
 import com.example.goal_tracker.auth.repository.UserRepository;
 import com.example.goal_tracker.auth.service.AuthService;
@@ -29,6 +29,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
 
+    private final UserMapper userMapper;
+
     @Override
     public LoginResponse login(LoginRequest loginRequest) throws BadCredentialsException {
         authenticationManager.authenticate(
@@ -51,16 +53,9 @@ public class AuthServiceImpl implements AuthService {
             throw new UserAlreadyExistsException();
         }
 
-        var user = User.builder()
-                .email(registerRequest.getEmail())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .firstName(registerRequest.getFirstName())
-                .lastName(registerRequest.getLastName())
-                .role(Role.PERSONAL_USER)
-                .build();
-
+        User user = userMapper.toUserWithEncodedPassword(registerRequest, passwordEncoder);
         userRepository.save(user);
-        var token = jwtService.generateToken(user);
+        String token = jwtService.generateToken(user);
 
         return LoginResponse.builder().token(token).build();
     }
