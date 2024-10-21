@@ -6,8 +6,13 @@ import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -50,5 +55,20 @@ public class GlobalExceptionHandler {
                 new GlobalExceptionResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR),
                 HttpStatus.INTERNAL_SERVER_ERROR
         ) ;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<GlobalExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+
+        List<String> errorMessages = e.getBindingResult().getAllErrors().stream()
+                .map(ObjectError::getDefaultMessage)
+                .collect(Collectors.toList());
+
+        String errorMessage = String.join(" ", errorMessages);
+
+        return new ResponseEntity<>(
+                new GlobalExceptionResponse(errorMessage, HttpStatus.BAD_REQUEST),
+                HttpStatus.BAD_REQUEST
+        );
     }
 }
