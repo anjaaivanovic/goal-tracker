@@ -48,7 +48,7 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public Goal findGoal(Long goalId) {
 
-        return goalRepository.findById(goalId).orElseThrow(GoalNotFoundException::new);
+        return goalRepository.findByIdWithTasks(goalId).orElseThrow(GoalNotFoundException::new);
     }
 
     @Override

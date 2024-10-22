@@ -2,6 +2,7 @@ package com.example.goal_tracker.global_exception_handling;
 
 import com.example.goal_tracker.auth.exception.UserAlreadyExistsException;
 import com.example.goal_tracker.auth.exception.UserNotFoundException;
+import com.example.goal_tracker.goal.exception.GoalNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,6 +70,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 new GlobalExceptionResponse(errorMessage, HttpStatus.BAD_REQUEST),
                 HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(GoalNotFoundException.class)
+    public ResponseEntity<GlobalExceptionResponse>  handleGoalNotFoundException(GoalNotFoundException e) {
+        return new ResponseEntity<>(
+                new GlobalExceptionResponse(e.getMessage(), e.getStatus()),
+                e.getStatus()
         );
     }
 }

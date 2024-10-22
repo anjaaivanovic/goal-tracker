@@ -58,7 +58,7 @@ public class GoalController {
         goalRequest.setCreatedById(userId);
         Goal newGoal = goalMapper.toGoal(goalRequest);
         GoalResponse response = goalMapper.toGoalResponse(goalService.addGoal(newGoal, goalRequest));
-        System.out.println(response);
+
         return ResponseEntity.ok(response);
     }
 }
