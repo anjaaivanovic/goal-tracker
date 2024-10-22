@@ -45,4 +45,30 @@ public class TaskServiceImpl implements TaskService {
 
         goalRepository.deleteById(taskId);
     }
+
+    @Override
+    public Task updateTaskStatus(Long taskId, boolean forwards) {
+
+        Task task = taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+
+        switch (task.getStatus()) {
+            case TO_DO:
+                if (forwards) {
+                    task.setStatus(Status.IN_PROGRESS);
+                }
+                break;
+            case IN_PROGRESS:
+                task.setStatus(forwards ? Status.DONE : Status.TO_DO);
+                break;
+            case DONE:
+                if (!forwards) {
+                    task.setStatus(Status.IN_PROGRESS);
+                }
+                break;
+            default:
+                break;
+        }
+
+        return taskRepository.save(task);
+    }
 }

@@ -41,4 +41,11 @@ public class TaskController {
 
         return ResponseEntity.ok("Task successfully deleted");
     }
+
+    @PreAuthorize("hasAnyRole('TEAM_LEAD', 'TEAM_MEMBER', 'PERSONAL_USER')")
+    @PutMapping("/{taskId}")
+    public ResponseEntity<TaskResponse> updateTaskStatus(@PathVariable Long taskId, @RequestParam boolean forwards) {
+
+        return ResponseEntity.ok(taskMapper.toTaskResponse(taskService.updateTaskStatus(taskId, forwards)));
+    }
 }
