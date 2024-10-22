@@ -53,7 +53,7 @@ public class GoalController {
     @PostMapping
     public ResponseEntity<GoalResponse> addGoal(
             @AuthenticationPrincipal(expression = "id") Long userId,
-            @RequestBody GoalRequest goalRequest) {
+            @Valid @RequestBody GoalRequest goalRequest) {
 
         goalRequest.setCreatedById(userId);
         Goal newGoal = goalMapper.toGoal(goalRequest);

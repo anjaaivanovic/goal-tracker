@@ -6,6 +6,7 @@ import com.example.goal_tracker.goal.exception.GoalNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -78,6 +79,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 new GlobalExceptionResponse(e.getMessage(), e.getStatus()),
                 e.getStatus()
+        );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<GlobalExceptionResponse>  handleHttpMessageNotReadableException(HttpMessageNotReadableException  e) {
+        return new ResponseEntity<>(
+                new GlobalExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST),
+                HttpStatus.BAD_REQUEST
         );
     }
 }

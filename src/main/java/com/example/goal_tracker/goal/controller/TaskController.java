@@ -5,6 +5,7 @@ import com.example.goal_tracker.goal.dto.TasksRequest;
 import com.example.goal_tracker.goal.mapper.TaskMapper;
 import com.example.goal_tracker.goal.model.Task;
 import com.example.goal_tracker.goal.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,7 +28,7 @@ public class TaskController {
     @PreAuthorize("hasAnyRole('TEAM_LEAD', 'PERSONAL_USER')")
     @PostMapping
     public ResponseEntity<List<TaskResponse>> addTask(
-            @RequestBody TasksRequest tasksRequest) {
+            @Valid @RequestBody TasksRequest tasksRequest) {
 
         List<Task> tasks = taskMapper.toTasks(tasksRequest.getTaskRequests());
         List<TaskResponse> taskResponses = taskMapper.toTaskResponses(taskService.addTasks(tasks, tasksRequest));

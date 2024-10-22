@@ -1,6 +1,7 @@
 package com.example.goal_tracker.auth.dto;
 
 import com.example.goal_tracker.auth.model.Role;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class RegisterRequest {
     @NotBlank(message = "Last name is required.")
     private String lastName;
 
+    @Email
     @NotBlank(message = "Email is required.")
     private String email;
 

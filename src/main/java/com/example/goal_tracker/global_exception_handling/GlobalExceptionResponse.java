@@ -7,6 +7,6 @@ import org.springframework.http.HttpStatus;
 @Data
 @AllArgsConstructor
 public class GlobalExceptionResponse {
-    private String exception;
+    private String message;
     private HttpStatus httpStatus;
 }
