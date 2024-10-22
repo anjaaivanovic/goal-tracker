@@ -17,6 +17,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -41,7 +44,8 @@ public class AuthServiceImpl implements AuthService {
         );
 
         var user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(UserNotFoundException::new);
-        var token = jwtService.generateToken(user);
+        HashMap<String, Object> additionalClaims = new HashMap<>(Map.of("id", (Object)user.getId()));
+        var token = jwtService.generateToken(additionalClaims, user);
 
         return LoginResponse.builder().token(token).build();
     }
@@ -55,7 +59,8 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userMapper.toUserWithEncodedPassword(registerRequest, passwordEncoder);
         userRepository.save(user);
-        String token = jwtService.generateToken(user);
+        HashMap<String, Object> additionalClaims = new HashMap<>(Map.of("id", (Object)user.getId()));
+        String token = jwtService.generateToken(additionalClaims, user);
 
         return LoginResponse.builder().token(token).build();
     }
