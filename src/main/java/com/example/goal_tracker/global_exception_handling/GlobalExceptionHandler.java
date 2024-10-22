@@ -1,6 +1,7 @@
 package com.example.goal_tracker.global_exception_handling;
 
 import com.example.goal_tracker.auth.exception.UserAlreadyExistsException;
+import com.example.goal_tracker.auth.exception.UserEngagedException;
 import com.example.goal_tracker.auth.exception.UserNotFoundException;
 import com.example.goal_tracker.goal.exception.GoalNotFoundException;
 import com.example.goal_tracker.goal.exception.NoAccessToResourceException;
@@ -102,6 +103,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoAccessToResourceException.class)
     public ResponseEntity<GlobalExceptionResponse>  handleNoPermissionException(NoAccessToResourceException e) {
+        return new ResponseEntity<>(
+                new GlobalExceptionResponse(e.getMessage(), e.getStatus()),
+                e.getStatus()
+        );
+    }
+
+    @ExceptionHandler(UserEngagedException.class)
+    public ResponseEntity<GlobalExceptionResponse>  handleUserEngagedException(UserEngagedException e) {
         return new ResponseEntity<>(
                 new GlobalExceptionResponse(e.getMessage(), e.getStatus()),
                 e.getStatus()
