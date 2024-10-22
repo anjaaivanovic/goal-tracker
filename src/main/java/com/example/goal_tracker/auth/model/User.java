@@ -1,5 +1,6 @@
 package com.example.goal_tracker.auth.model;
 
+import com.example.goal_tracker.goal.model.Goal;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +35,12 @@ public class User implements UserDetails {
 
     @Enumerated
     private Role role;
+
+    @OneToMany(mappedBy = "createdBy")
+    private List<Goal> createdGoals;
+
+    @OneToMany(mappedBy = "assignee")
+    private List<Goal> assignedGoals;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
