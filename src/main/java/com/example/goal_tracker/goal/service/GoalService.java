@@ -12,4 +12,6 @@ public interface GoalService {
     Goal findGoal(Long goalId);
 
     Goal addGoal(Goal goal, GoalRequest goalRequest);
+
+    void deleteGoal(Long goalId);
 }

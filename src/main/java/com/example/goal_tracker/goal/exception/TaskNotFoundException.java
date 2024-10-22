@@ -5,10 +5,10 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class GoalNotFoundException extends EntityNotFoundException {
+public class TaskNotFoundException extends EntityNotFoundException {
     private final HttpStatus status = HttpStatus.NOT_FOUND;
 
-    public GoalNotFoundException() {
-        super("Goal not found.");
+    public TaskNotFoundException() {
+        super("Task not found.");
     }
 }

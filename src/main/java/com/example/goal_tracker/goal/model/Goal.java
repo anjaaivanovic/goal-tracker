@@ -21,14 +21,19 @@ public class Goal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private Status status;
 
+    @Column(nullable = false)
     private LocalDate dateCreated;
 
+    @Column(nullable = false)
     private LocalDate deadline;
 
     @ManyToOne
@@ -37,6 +42,6 @@ public class Goal {
     @ManyToOne
     private User assignee;
 
-    @OneToMany(mappedBy = "parentGoal")
+    @OneToMany(mappedBy = "parentGoal", cascade = CascadeType.REMOVE)
     private List<Task> tasks;
 }

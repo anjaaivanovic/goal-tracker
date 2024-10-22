@@ -2,6 +2,7 @@ package com.example.goal_tracker.goal.service.impl;
 
 import com.example.goal_tracker.goal.dto.TasksRequest;
 import com.example.goal_tracker.goal.exception.GoalNotFoundException;
+import com.example.goal_tracker.goal.exception.TaskNotFoundException;
 import com.example.goal_tracker.goal.model.Goal;
 import com.example.goal_tracker.goal.model.Status;
 import com.example.goal_tracker.goal.model.Task;
@@ -34,5 +35,14 @@ public class TaskServiceImpl implements TaskService {
         });
 
         return taskRepository.saveAll(tasks);
+    }
+
+    @Override
+    public void deleteTask(Long taskId) {
+        if(!taskRepository.existsById(taskId)) {
+            throw new TaskNotFoundException();
+        }
+
+        goalRepository.deleteById(taskId);
     }
 }

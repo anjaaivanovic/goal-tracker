@@ -19,14 +19,19 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private Status status;
 
+    @Column(nullable = false)
     private LocalDate dateCreated;
 
+    @Column(nullable = false)
     private LocalDate deadline;
 
     @ManyToOne

@@ -64,4 +64,14 @@ public class GoalServiceImpl implements GoalService {
 
         return goalRepository.save(goal);
     }
+
+    @Override
+    public void deleteGoal(Long goalId) {
+
+        if(!goalRepository.existsById(goalId)) {
+            throw new GoalNotFoundException();
+        }
+
+        goalRepository.deleteById(goalId);
+    }
 }

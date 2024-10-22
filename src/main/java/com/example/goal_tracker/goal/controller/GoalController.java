@@ -61,4 +61,13 @@ public class GoalController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PreAuthorize("hasAnyRole('TEAM_LEAD', 'PERSONAL_USER')")
+    @DeleteMapping("/{goalId}")
+    public ResponseEntity<String> deleteGoal(@PathVariable Long goalId) {
+
+        goalService.deleteGoal(goalId);
+
+        return ResponseEntity.ok("Goal successfully deleted");
+    }
 }
