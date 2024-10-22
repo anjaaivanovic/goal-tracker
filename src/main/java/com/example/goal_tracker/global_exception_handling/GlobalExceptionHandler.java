@@ -3,6 +3,7 @@ package com.example.goal_tracker.global_exception_handling;
 import com.example.goal_tracker.auth.exception.UserAlreadyExistsException;
 import com.example.goal_tracker.auth.exception.UserNotFoundException;
 import com.example.goal_tracker.goal.exception.GoalNotFoundException;
+import com.example.goal_tracker.goal.exception.NoAccessToResourceException;
 import com.example.goal_tracker.goal.exception.TaskNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
@@ -93,6 +94,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TaskNotFoundException.class)
     public ResponseEntity<GlobalExceptionResponse>  handleTaskNotFoundException(TaskNotFoundException e) {
+        return new ResponseEntity<>(
+                new GlobalExceptionResponse(e.getMessage(), e.getStatus()),
+                e.getStatus()
+        );
+    }
+
+    @ExceptionHandler(NoAccessToResourceException.class)
+    public ResponseEntity<GlobalExceptionResponse>  handleNoPermissionException(NoAccessToResourceException e) {
         return new ResponseEntity<>(
                 new GlobalExceptionResponse(e.getMessage(), e.getStatus()),
                 e.getStatus()

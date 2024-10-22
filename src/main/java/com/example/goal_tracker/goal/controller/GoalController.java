@@ -32,7 +32,8 @@ public class GoalController {
     @GetMapping
     public ResponseEntity<Page<GoalResponse>> findGoals(
             @AuthenticationPrincipal(expression = "id") Long userId,
-            @Valid @ModelAttribute PaginationRequest paginationRequest) {
+            @Valid @ModelAttribute PaginationRequest paginationRequest
+    ) {
 
         paginationRequest.setUserId(userId);
         Page<Goal> goalPage = goalService.findGoals(paginationRequest);
@@ -43,9 +44,12 @@ public class GoalController {
 
     @PreAuthorize("hasAnyRole('TEAM_LEAD', 'PERSONAL_USER', 'TEAM_MEMBER')")
     @GetMapping("/{goalId}")
-    public ResponseEntity<GoalWithTasksResponse> findGoal(@PathVariable Long goalId) {
+    public ResponseEntity<GoalWithTasksResponse> findGoal(
+            @AuthenticationPrincipal(expression = "id") Long userId,
+            @PathVariable Long goalId
+    ) {
 
-        var mapped = goalMapper.toGoalWithTasksResponse(goalService.findGoal(goalId));
+        var mapped = goalMapper.toGoalWithTasksResponse(goalService.findGoal(goalId, userId));
         return ResponseEntity.ok(mapped);
     }
 
@@ -53,7 +57,8 @@ public class GoalController {
     @PostMapping
     public ResponseEntity<GoalResponse> addGoal(
             @AuthenticationPrincipal(expression = "id") Long userId,
-            @Valid @RequestBody GoalRequest goalRequest) {
+            @Valid @RequestBody GoalRequest goalRequest
+    ) {
 
         goalRequest.setCreatedById(userId);
         Goal newGoal = goalMapper.toGoal(goalRequest);
@@ -64,9 +69,12 @@ public class GoalController {
 
     @PreAuthorize("hasAnyRole('TEAM_LEAD', 'PERSONAL_USER')")
     @DeleteMapping("/{goalId}")
-    public ResponseEntity<String> deleteGoal(@PathVariable Long goalId) {
+    public ResponseEntity<String> deleteGoal(
+            @AuthenticationPrincipal(expression = "id") Long userId,
+            @PathVariable Long goalId
+    ) {
 
-        goalService.deleteGoal(goalId);
+        goalService.deleteGoal(goalId, userId);
 
         return ResponseEntity.ok("Goal successfully deleted");
     }

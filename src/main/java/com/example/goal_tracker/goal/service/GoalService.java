@@ -9,9 +9,9 @@ public interface GoalService {
 
     Page<Goal> findGoals(PaginationRequest paginationRequest);
 
-    Goal findGoal(Long goalId);
+    Goal findGoal(Long goalId, Long userId);
 
     Goal addGoal(Goal goal, GoalRequest goalRequest);
 
-    void deleteGoal(Long goalId);
+    void deleteGoal(Long goalId, Long userId);
 }

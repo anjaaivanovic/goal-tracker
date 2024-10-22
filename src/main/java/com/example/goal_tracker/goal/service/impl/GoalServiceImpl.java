@@ -6,6 +6,7 @@ import com.example.goal_tracker.auth.repository.UserRepository;
 import com.example.goal_tracker.goal.dto.GoalRequest;
 import com.example.goal_tracker.goal.dto.PaginationRequest;
 import com.example.goal_tracker.goal.exception.GoalNotFoundException;
+import com.example.goal_tracker.goal.exception.NoAccessToResourceException;
 import com.example.goal_tracker.goal.model.Goal;
 import com.example.goal_tracker.goal.model.Status;
 import com.example.goal_tracker.goal.repository.GoalRepository;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -46,9 +48,15 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public Goal findGoal(Long goalId) {
+    public Goal findGoal(Long goalId, Long userId) {
 
-        return goalRepository.findByIdWithTasks(goalId).orElseThrow(GoalNotFoundException::new);
+        Goal goal = goalRepository.findByIdWithTasks(goalId).orElseThrow(GoalNotFoundException::new);
+
+        if (!Objects.equals(goal.getCreatedBy().getId(), userId) && !Objects.equals(goal.getAssignee().getId(), userId)) {
+            throw new NoAccessToResourceException();
+        }
+
+        return goal;
     }
 
     @Override
@@ -66,10 +74,12 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public void deleteGoal(Long goalId) {
+    public void deleteGoal(Long goalId, Long userId) {
 
-        if(!goalRepository.existsById(goalId)) {
-            throw new GoalNotFoundException();
+        Goal goal = goalRepository.findById(goalId).orElseThrow(GoalNotFoundException::new);
+
+        if (!Objects.equals(goal.getCreatedBy().getId(), userId)){
+            throw new NoAccessToResourceException();
         }
 
         goalRepository.deleteById(goalId);
