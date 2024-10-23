@@ -13,14 +13,19 @@ import com.example.goal_tracker.goal.repository.GoalRepository;
 import com.example.goal_tracker.goal.service.GoalService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +35,12 @@ public class GoalServiceImpl implements GoalService {
     private final GoalRepository goalRepository;
 
     private final UserRepository userRepository;
+
+    @Value("${deadlines.nearing}")
+    private String nearingDeadlineString;
+
+    @Value("${deadlines.behind}")
+    private String behindDeadlineString;
 
     @Override
     public Page<Goal> findGoals(PaginationRequest paginationRequest) {
@@ -83,5 +94,36 @@ public class GoalServiceImpl implements GoalService {
         }
 
         goalRepository.deleteById(goalId);
+    }
+
+    @Scheduled(cron = "${cron.daily}")
+    void checkDeadlines() {
+        notifyUsersAboutDeadlines(LocalDate.now(), LocalDate.now().plusDays(3), nearingDeadlineString);
+        notifyUsersAboutDeadlines(LocalDate.now(), LocalDate.now(), behindDeadlineString);
+    }
+
+    private void notifyUsersAboutDeadlines(LocalDate startDate, LocalDate endDate, String template) {
+        List<Goal> goals = template.equals(nearingDeadlineString) ?
+                goalRepository.findGoalsBetweenDates(startDate, endDate)
+                : goalRepository.findGoalsBeforeDate(endDate);
+
+        Map<String, List<Goal>> groupedGoals = goals.stream().collect(Collectors.groupingBy(goal -> goal.getAssignee().getEmail()));
+
+        groupedGoals.forEach((email, userGoals) -> {
+            String notification = createNotificationBody(userGoals, template);
+        });
+    }
+
+    private String createNotificationBody(List<Goal> goals, String template) {
+        StringBuilder notificationBuilder = new StringBuilder(template);
+        goals.forEach(goal -> notificationBuilder
+                .append("<li>#").append(goal.getId().toString())
+                .append(" - ")
+                .append(goal.getTitle())
+                .append(" - ")
+                .append(goal.getDeadline().toString())
+                .append("</li>"));
+
+        return notificationBuilder.append("</ul>").toString();
     }
 }
