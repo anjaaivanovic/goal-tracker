@@ -1,3 +1,5 @@
 deadlines:
   nearing: "<h3>You have some goals nearing their deadlines:</h3><ul>"
   behind: "<h3>You have some goals behind their deadlines:</h3><ul>"
+  nearing-subject: "Goals nearing deadlines"
+  behind-subject: "Goals behind deadlines"

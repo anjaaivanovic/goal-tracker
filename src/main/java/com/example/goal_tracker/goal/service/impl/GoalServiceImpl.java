@@ -11,6 +11,8 @@ import com.example.goal_tracker.goal.model.Goal;
 import com.example.goal_tracker.goal.model.Status;
 import com.example.goal_tracker.goal.repository.GoalRepository;
 import com.example.goal_tracker.goal.service.GoalService;
+import com.example.goal_tracker.util.EmailService;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,11 +38,19 @@ public class GoalServiceImpl implements GoalService {
 
     private final UserRepository userRepository;
 
+    private final EmailService emailService;
+
     @Value("${deadlines.nearing}")
-    private String nearingDeadlineString;
+    private String nearingDeadlineBody;
 
     @Value("${deadlines.behind}")
-    private String behindDeadlineString;
+    private String behindDeadlineBody;
+
+    @Value("${deadlines.nearing-subject}")
+    private String nearingDeadlineSubject;
+
+    @Value("${deadlines.behind-subject}")
+    private String behindDeadlineSubject;
 
     @Override
     public Page<Goal> findGoals(PaginationRequest paginationRequest) {
@@ -98,12 +108,12 @@ public class GoalServiceImpl implements GoalService {
 
     @Scheduled(cron = "${cron.daily}")
     void checkDeadlines() {
-        notifyUsersAboutDeadlines(LocalDate.now(), LocalDate.now().plusDays(3), nearingDeadlineString);
-        notifyUsersAboutDeadlines(LocalDate.now(), LocalDate.now(), behindDeadlineString);
+        notifyUsersAboutDeadlines(LocalDate.now(), LocalDate.now().plusDays(3), nearingDeadlineSubject, nearingDeadlineBody);
+        notifyUsersAboutDeadlines(LocalDate.now(), LocalDate.now(), behindDeadlineSubject, behindDeadlineBody);
     }
 
-    private void notifyUsersAboutDeadlines(LocalDate startDate, LocalDate endDate, String template) {
-        List<Goal> goals = template.equals(nearingDeadlineString) ?
+    private void notifyUsersAboutDeadlines(LocalDate startDate, LocalDate endDate, String subject, String template) {
+        List<Goal> goals = template.equals(nearingDeadlineBody) ?
                 goalRepository.findGoalsBetweenDates(startDate, endDate)
                 : goalRepository.findGoalsBeforeDate(endDate);
 
@@ -111,6 +121,11 @@ public class GoalServiceImpl implements GoalService {
 
         groupedGoals.forEach((email, userGoals) -> {
             String notification = createNotificationBody(userGoals, template);
+            try {
+                emailService.sendEmail(email, subject, notification);
+            } catch (MessagingException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
